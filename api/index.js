@@ -166,7 +166,7 @@ app.get('/', async (c) => {
       break;
 
     case 'calendar':
-      const calIcalUrl = 'https://cloud.jonasebert.de/remote.php/dav/public-calendars/bn8yfoyg8GEQ6TNN?export';
+      const calIcalUrl = 'https://cloud.jonaebert.de/remote.php/dav/public-calendars/bn8yfoyg8GEQ6TNN?export';
       const calNow = new Date();
       const calLater = new Date(calNow.getFullYear(), calNow.getMonth()+3, calNow.getDate()+1);
       const calMaxItems = c.req.queries('maxitems')?.shift() || '93';
@@ -255,7 +255,7 @@ app.get('/', async (c) => {
           // Extract Teaserimage ID
           const calTeaserImageMatch = calEvent.description?.match(/teaserimage:\s*(.+)/);
           const calTeaserImageId = calTeaserImageMatch ? calTeaserImageMatch[1] : null;
-          const calTeaserImageUrl = calTeaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
+          const calTeaserImageUrl = calTeaserImageId ? `https://cloud.jonaebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
           // Extract Teaserimage copyright text
           const calTeaserImageCopyrightTextMatch = calEvent.description?.match(/teasercopyright:\s*(.+)/);
           const calTeaserImageCopyrightText = calTeaserImageCopyrightTextMatch ? calTeaserImageCopyrightTextMatch[1] : null;
