@@ -166,7 +166,7 @@ app.get('/', async (c) => {
       break;
 
     case 'calendar':
-      const calIcalUrl = 'https://wolke.jonaebert.de/remote.php/dav/public-calendars/bn8yfoyg8GEQ6TNN?export';
+      const calIcalUrl = 'https://wolke.jonaebert.de/remote.php/dav/public-calendars/KawfLgSTT68H2dLy?export';
       const calNow = new Date();
       const calLater = new Date(calNow.getFullYear(), calNow.getMonth()+3, calNow.getDate()+1);
       const calMaxItems = c.req.queries('maxitems')?.shift() || '93';
