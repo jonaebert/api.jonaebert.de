@@ -5,13 +5,13 @@
     "deploy": "vercel"
   },
   "dependencies": {
-    "@prismicio/client": "^7.13.1",
-    "hono": "^4.6.15",
-    "ical-generator": "^8.0.1",
+    "@prismicio/client": "^7.15.1",
+    "hono": "^4.6.17",
+    "ical-generator": "^8.1.1",
     "node-ical": "^0.20.1",
     "rrule": "^2.8.1"
   },
   "devDependencies": {
-    "vercel": "^39.2.4"
+    "vercel": "^39.3.0"
   }
 }
