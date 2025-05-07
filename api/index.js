@@ -1,7 +1,7 @@
 // Basics
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import { handle } from 'hono/vercel'
+import { serve } from '@hono/node-server'
 
 // For Blog
 import * as prismic from '@prismicio/client'
@@ -76,7 +76,7 @@ app.post('/', async (p) => {
         if (contactRes.status == 200) {
           return p.json({ message: "Message send" })
         } else {
-          return p.json(undefined, {status: 500})
+          return p.json(undefined, { status: 500 })
         }
       } catch (error) {
         console.error(error);
@@ -88,7 +88,7 @@ app.post('/', async (p) => {
         }, 500);
       }
       break;
-  
+
     default:
       console.error(`Missing or invalid Action: ${postAction}`);
       return p.json({
@@ -124,13 +124,13 @@ app.get('/', async (c) => {
       try {
         switch (blogItemType) {
           case 'all':
-            blogResp = await prismicClient.getByType('article', { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: blogMaxItems});
+            blogResp = await prismicClient.getByType('article', { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: blogMaxItems });
             blogPosts = blogResp.results;
             break;
 
           case 'category':
             const blogCategory = c.req.queries('category')?.shift();
-            blogResp = await prismicClient.getByTag(blogCategory, { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: blogMaxItems});
+            blogResp = await prismicClient.getByTag(blogCategory, { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: blogMaxItems });
             blogPosts = blogResp.results;
             break;
 
@@ -149,7 +149,7 @@ app.get('/', async (c) => {
                 type: c.req.queries('itemtype')?.shift() || null
               }
             }, 500);
-          }
+        }
 
         return c.json({
           data: blogPosts
@@ -168,7 +168,7 @@ app.get('/', async (c) => {
     case 'calendar':
       const calIcalUrl = 'https://wolke.jonaebert.de/remote.php/dav/public-calendars/KawfLgSTT68H2dLy?export';
       const calNow = new Date();
-      const calLater = new Date(calNow.getFullYear(), calNow.getMonth()+3, calNow.getDate()+1);
+      const calLater = new Date(calNow.getFullYear(), calNow.getMonth() + 3, calNow.getDate() + 1);
       const calMaxItems = c.req.queries('maxitems')?.shift() || '93';
 
       let calResp = [];
@@ -186,18 +186,18 @@ app.get('/', async (c) => {
         // Handle (recurrend) events
         for (const calEvent of Object.values(calData)) {
           if (calEvent.type === 'VEVENT') {
-              let calOccurrences = [];
-              if (calEvent.rrule) {
-                  const calRule = rrulestr(calEvent.rrule.toString(), { dtstart: calEvent.start });
-                  calOccurrences = calRule.between(calNow, calLater, true).map(calDate => ({
-                      ...calEvent,
-                      start: calData,
-                      end: new Date(calData.getTime() + (calEvent.end - calEvent.start))
-                  }));
-              } else if ((calEvent.start >= calNow && calEvent.start <= calLater) || (calEvent.end >= calNow && calEvent.end <= calLater)) {
-                  calOccurrences.push(calEvent);
-              }
-              calEvents.push(...calOccurrences);
+            let calOccurrences = [];
+            if (calEvent.rrule) {
+              const calRule = rrulestr(calEvent.rrule.toString(), { dtstart: calEvent.start });
+              calOccurrences = calRule.between(calNow, calLater, true).map(calDate => ({
+                ...calEvent,
+                start: calData,
+                end: new Date(calData.getTime() + (calEvent.end - calEvent.start))
+              }));
+            } else if ((calEvent.start >= calNow && calEvent.start <= calLater) || (calEvent.end >= calNow && calEvent.end <= calLater)) {
+              calOccurrences.push(calEvent);
+            }
+            calEvents.push(...calOccurrences);
           }
         }
         // Sort events
@@ -237,13 +237,13 @@ app.get('/', async (c) => {
                 error: 'Invalid item type',
                 valid: ['all', 'single'],
                 debug: { ItemType: calItemType ? calItemType : null }
-              }, 400);        
+              }, 400);
           }
         } catch (error) {
           console.error('[CALENDAR] Error fetching or parsing ICS file:', error);
           return c.json({
             error: 'Failed to fetch or parse ICS file',
-            debug: {data: calEvents}
+            debug: { data: calEvents }
           }, 500);
         }
 
@@ -255,7 +255,7 @@ app.get('/', async (c) => {
           // Extract Teaserimage ID
           const calTeaserImageMatch = calEvent.description?.match(/teaserimage:\s*(.+)/);
           const calTeaserImageId = calTeaserImageMatch ? calTeaserImageMatch[1] : null;
-          const calTeaserImageUrl = calTeaserImageId ? `https://wolke.jonaebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
+          const calTeaserImageUrl = calTeaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
           // Extract Teaserimage copyright text
           const calTeaserImageCopyrightTextMatch = calEvent.description?.match(/teasercopyright:\s*(.+)/);
           const calTeaserImageCopyrightText = calTeaserImageCopyrightTextMatch ? calTeaserImageCopyrightTextMatch[1] : null;
@@ -295,7 +295,7 @@ app.get('/', async (c) => {
             teaserImage: {
               url: calTeaserImageUrl ? calTeaserImageUrl : null,
               copyright: {
-                text: calTeaserImageCopyrightText ?  calTeaserImageCopyrightText : null,
+                text: calTeaserImageCopyrightText ? calTeaserImageCopyrightText : null,
                 url: calTeaserImageCopyrighUrl ? calTeaserImageCopyrighUrl : null
               }
             },
@@ -333,7 +333,7 @@ app.get('/', async (c) => {
         }, 500);
       }
       break;
-  
+
     default:
       console.error(`Invalid Type: ${c.req.queries('type')?.shift() || null}`);
       return c.json({
@@ -346,10 +346,6 @@ app.get('/', async (c) => {
   }
 })
 
-const handler = handle(app);
-
-export const GET = handler;
-export const POST = handler;
-export const PATCH = handler;
-export const PUT = handler;
-export const OPTIONS = handler;
+serve(app, (info) => {
+  console.log(`Listening on http://localhost:${info.port}`) // Listening on http://localhost:3000
+})
