@@ -351,5 +351,5 @@ serve({
   port: parseInt(process.env.PORT || '3000'),
   hostname: '0.0.0.0'
 }, (info) => {
-  console.log(`Listening on http://${info.hostname}:${info.port}`)
+  // console.log(`Listening on http://${info.hostname}:${info.port}`)
 })
