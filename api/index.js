@@ -346,6 +346,10 @@ app.get('/', async (c) => {
   }
 })
 
-serve(app, (info) => {
-  console.log(`Listening on http://localhost:${info.port}`) // Listening on http://localhost:3000
+serve({
+  fetch: app.fetch,
+  port: parseInt(process.env.PORT || '3000'),
+  hostname: '0.0.0.0'
+}, (info) => {
+  console.log(`Listening on http://${info.hostname}:${info.port}`)
 })
