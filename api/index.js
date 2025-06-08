@@ -2,6 +2,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serve } from '@hono/node-server'
+import 'dotenv/config';
 
 // For Blog
 import * as prismic from '@prismicio/client'
@@ -12,6 +13,7 @@ import ical from 'ical-generator';
 import pkg_rrule from 'rrule';
 const { parseICS } = pkg_ical;
 const { rrulestr } = pkg_rrule;
+const cloudBaseURI = process.env.JE_CLOUD_BASE_URI;
 
 const app = new Hono().basePath('/api')
 
@@ -176,7 +178,7 @@ app.get('/', async (c) => {
       try {
         calResp = await fetch(calIcalUrl, {
           headers: {
-            'User-Agent': 'Jonas Ebert/1.0'
+            'User-Agent': 'Jona Ebert/1.0'
           }
         });
         const calRespText = await calResp.text();
@@ -255,7 +257,7 @@ app.get('/', async (c) => {
           // Extract Teaserimage ID
           const calTeaserImageMatch = calEvent.description?.match(/teaserimage:\s*(.+)/);
           const calTeaserImageId = calTeaserImageMatch ? calTeaserImageMatch[1] : null;
-          const calTeaserImageUrl = calTeaserImageId ? `https://cloud.jonasebert.de/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
+          const calTeaserImageUrl = calTeaserImageId ? `${cloudBaseURI}/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
           // Extract Teaserimage copyright text
           const calTeaserImageCopyrightTextMatch = calEvent.description?.match(/teasercopyright:\s*(.+)/);
           const calTeaserImageCopyrightText = calTeaserImageCopyrightTextMatch ? calTeaserImageCopyrightTextMatch[1] : null;
