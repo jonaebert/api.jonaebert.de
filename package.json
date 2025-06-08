@@ -5,9 +5,9 @@
     "start": "node api/index.js"
   },
   "dependencies": {
-    "@hono/node-server": "^1.14.2",
-    "@prismicio/client": "^7.13.1",
-    "hono": "^4.7.10",
+    "@hono/node-server": "^1.14.3",
+    "@prismicio/client": "^7.17.3",
+    "hono": "^4.7.11",
     "ical-generator": "^9.0.0",
     "node-ical": "^0.20.1",
     "rrule": "^2.8.1"
