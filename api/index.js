@@ -116,7 +116,7 @@ app.get('/', async (c) => {
       const blogMaxItems = c.req.queries('maxitems')?.shift() || '30'
       const blogItemType = c.req.queries('itemtype')?.shift()
 
-      const prismicClient = prismic.createClient('jonaebert', {
+      const prismicClient = prismic.createClient('jonasebert', {
         routes: [
           { type: 'article', path: '/blog/:uid' },
         ],
