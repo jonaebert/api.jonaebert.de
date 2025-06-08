@@ -1,17 +1,15 @@
 {
   "type": "module",
   "scripts": {
-    "start": "vercel dev",
-    "deploy": "vercel"
+    "dev": "node api/index.js",
+    "start": "node api/index.js"
   },
   "dependencies": {
-    "@prismicio/client": "^7.17.2",
-    "hono": "^4.7.8",
-    "ical-generator": "^8.1.1",
+    "@hono/node-server": "^1.14.3",
+    "@prismicio/client": "^7.17.3",
+    "hono": "^4.7.11",
+    "ical-generator": "^9.0.0",
     "node-ical": "^0.20.1",
     "rrule": "^2.8.1"
-  },
-  "devDependencies": {
-    "vercel": "^41.7.0"
   }
 }
