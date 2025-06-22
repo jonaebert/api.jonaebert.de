@@ -84,7 +84,7 @@ app.get('/', async (c) => {
       } catch (error) {
         console.error(error);
         return c.json({
-          error: 'An error occured',
+          error: 'An error occurred',
           debug: {
             error: null
           }
