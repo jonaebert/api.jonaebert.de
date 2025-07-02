@@ -7,7 +7,7 @@
   "dependencies": {
     "@hono/node-server": "^1.14.4",
     "@prismicio/client": "^7.17.3",
-    "hono": "^4.8.2",
+    "hono": "^4.8.3",
     "ical-generator": "^9.0.0",
     "node-ical": "^0.20.1",
     "rrule": "^2.8.1"
