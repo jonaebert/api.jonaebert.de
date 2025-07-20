@@ -65,6 +65,38 @@ app.get('/', async (c) => {
             });
             blogJSON = await blogResp.json();
             blogPosts = blogJSON.data;
+
+            // Upgrade shared. objects
+            const blocks = blogPosts?.blocks || [];
+
+            const enrichedBlocks = await Promise.all(
+              blocks.map(async (block) => {
+                if (block.__component === 'shared.media' && block.temp_file_id) {
+                  try {
+                    const mediaResp = await fetch(`${cmsBaseURI}/api/upload/files/${block.temp_file_id}?populate=*`, {
+                      headers: {
+                        Authorization: `Bearer ${cmsAPIToken}`
+                      }
+                    });
+                    const mediaData = await mediaResp.json();
+                    const { temp_file_id, ...media } = block;
+
+                    return {
+                      ...media,
+                      media: mediaData
+                    }
+                  } catch (error) {
+                    console.error(`Error fetching media for block ${block.id}:`, error);
+                    return block;
+                  }
+                } else {
+                  return block;
+                }
+              })
+            )
+
+            blogPosts.blocks = enrichedBlocks;
+
             break;
 
           default:
