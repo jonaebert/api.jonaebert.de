@@ -58,45 +58,13 @@ app.get('/', async (c) => {
 
           case 'post':
             const blogPostId = c.req.queries('postid')?.shift();
-            blogResp = await fetch(`${cmsBaseURI}/api/articles/${blogPostId}?populate=*`, {
+            blogResp = await fetch(`${cmsBaseURI}/api/articles/${blogPostId}?populate[author][populate]=avatar&populate[cover][populate]&populate[copyright][populate]=*&populate[blocks][populate]=*`, {
               headers: {
                 Authorization: `Bearer ${cmsAPIToken}`
               }
             });
             blogJSON = await blogResp.json();
             blogPosts = blogJSON.data;
-
-            // Upgrade shared. objects
-            const blocks = blogPosts?.blocks || [];
-
-            const enrichedBlocks = await Promise.all(
-              blocks.map(async (block) => {
-                if (block.__component === 'shared.media' && block.temp_file_id) {
-                  try {
-                    const mediaResp = await fetch(`${cmsBaseURI}/api/upload/files/${block.temp_file_id}?populate=*`, {
-                      headers: {
-                        Authorization: `Bearer ${cmsAPIToken}`
-                      }
-                    });
-                    const mediaData = await mediaResp.json();
-                    const { temp_file_id, ...media } = block;
-
-                    return {
-                      ...media,
-                      media: mediaData
-                    }
-                  } catch (error) {
-                    console.error(`Error fetching media for block ${block.id}:`, error);
-                    return block;
-                  }
-                } else {
-                  return block;
-                }
-              })
-            )
-
-            blogPosts.blocks = enrichedBlocks;
-
             break;
 
           default:
