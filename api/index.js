@@ -5,7 +5,8 @@ import { serve } from '@hono/node-server'
 import 'dotenv/config';
 
 // For Blog
-import * as prismic from '@prismicio/client'
+const cmsBaseURI = process.env.JE_CMS_API_BASE_URL;
+const cmsAPIToken = process.env.JE_CMS_API_TOKEN;
 
 // For calendar
 import pkg_ical from 'node-ical';
@@ -41,30 +42,29 @@ app.get('/', async (c) => {
       const blogMaxItems = c.req.queries('maxitems')?.shift() || '30'
       const blogItemType = c.req.queries('itemtype')?.shift()
 
-      const prismicClient = prismic.createClient('jonasebert', {
-        routes: [
-          { type: 'article', path: '/blog/:uid' },
-        ],
-        fetch: fetch
-      })
-
       try {
+        let blogJSON = '';
         switch (blogItemType) {
           case 'all':
-            blogResp = await prismicClient.getByType('article', { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: blogMaxItems });
-            blogPosts = blogResp.results;
-            break;
-
-          case 'category':
-            const blogCategory = c.req.queries('category')?.shift();
-            blogResp = await prismicClient.getByTag(blogCategory, { orderings: { field: 'document.first_publication_date', direction: 'desc' }, pageSize: blogMaxItems });
-            blogPosts = blogResp.results;
+            // Fehlt noch Implementierung für maxitems
+            blogResp = await fetch(`${cmsBaseURI}/api/articles?populate=cover&populate=copyright&sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=${blogMaxItems}`, {
+              headers: {
+                Authorization: `Bearer ${cmsAPIToken}`
+              }
+            });
+            blogJSON = await blogResp.json();
+            blogPosts = blogJSON.data;
             break;
 
           case 'post':
             const blogPostId = c.req.queries('postid')?.shift();
-            blogResp = await prismicClient.getByUID('article', blogPostId,);
-            blogPosts = blogResp;
+            blogResp = await fetch(`${cmsBaseURI}/api/articles/${blogPostId}?populate[author][populate]=avatar&populate[cover][populate]&populate[copyright][populate]=*&populate[blocks][populate]=*`, {
+              headers: {
+                Authorization: `Bearer ${cmsAPIToken}`
+              }
+            });
+            blogJSON = await blogResp.json();
+            blogPosts = blogJSON.data;
             break;
 
           default:
