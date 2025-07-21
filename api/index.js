@@ -178,11 +178,25 @@ app.get('/', async (c) => {
         calEvents = calEvents.slice(0, calMaxItems);
 
         // Customize events
-        calEvents = calEvents.map(calEvent => {
+        calEvents = await Promise.all(calEvents.map(async calEvent => {
           // Extract Teaserimage ID
           const calTeaserImageMatch = calEvent.description?.match(/teaserimage:\s*(.+)/);
           const calTeaserImageId = calTeaserImageMatch ? calTeaserImageMatch[1] : null;
-          const calTeaserImageUrl = calTeaserImageId ? `${cloudBaseURI}/index.php/apps/files_sharing/publicpreview/${calTeaserImageId}?x=3440&y=1440&a=true` : null;
+          let calCMSTeaserData = null;
+          if (calTeaserImageId) {
+            try {
+              const cmsTeaserResp = await fetch(`${cmsBaseURI}/api/upload/files/${calTeaserImageId}?populate=*`, {
+                headers: {
+                  Authorization: `Bearer ${cmsAPIToken}`
+                }
+              });
+              const calCMSTeaserJSON = await cmsTeaserResp.json();
+              calCMSTeaserData = calCMSTeaserJSON;
+            } catch (error) {
+              console.error('[CMS] Failed to fetch event teaser image from CMS:', calTeaserImageId);
+            }
+          }
+          const calTeaserImageData = calCMSTeaserData ? calCMSTeaserData : null;
           // Extract Teaserimage copyright text
           const calTeaserImageCopyrightTextMatch = calEvent.description?.match(/teasercopyright:\s*(.+)/);
           const calTeaserImageCopyrightText = calTeaserImageCopyrightTextMatch ? calTeaserImageCopyrightTextMatch[1] : null;
@@ -220,7 +234,8 @@ app.get('/', async (c) => {
             description: calEventDescription,
             state: calEvent.status ? calEvent.status : "TENTATIVE",
             teaserImage: {
-              url: calTeaserImageUrl ? calTeaserImageUrl : null,
+              // url: calTeaserImageUrl ? calTeaserImageUrl : null,
+              data: calCMSTeaserData ? calTeaserImageData : null,
               copyright: {
                 text: calTeaserImageCopyrightText ? calTeaserImageCopyrightText : null,
                 url: calTeaserImageCopyrighUrl ? calTeaserImageCopyrighUrl : null
@@ -228,7 +243,7 @@ app.get('/', async (c) => {
             },
             url: calEventUrl ? calEventUrl : null
           }
-        });
+        }));
 
         const download = c.req.queries('download')?.shift() === 'true';
         if (download) {
