@@ -47,7 +47,7 @@ app.get('/', async (c) => {
         switch (blogItemType) {
           case 'all':
             // Fehlt noch Implementierung für maxitems
-            blogResp = await fetch(`${cmsBaseURI}/api/articles?populate=cover&populate=copyright&populate[author][populate]=avatar&sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=${blogMaxItems}`, {
+            blogResp = await fetch(`${cmsBaseURI}/api/articles?populate[cover]=true&populate[copyright]=true&populate[author][populate][avatar]=true&sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=${blogMaxItems}`, {
               headers: {
                 Authorization: `Bearer ${cmsAPIToken}`
               }
