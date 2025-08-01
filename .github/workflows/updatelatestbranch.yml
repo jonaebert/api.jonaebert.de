@@ -1,0 +1,42 @@
+name: Update latest branch on stable tag
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - '*'  # alle Tags
+
+jobs:
+  update-latest-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if tag is a prerelease
+        id: check_tag
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          echo "Tag: $TAG_NAME"
+          if [[ "$TAG_NAME" =~ (-rc|-beta|-alpha) ]]; then
+            echo "This is a prerelease tag. Skipping."
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "This is a stable release tag."
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout repo
+        if: steps.check_tag.outputs.prerelease == 'false'
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Checkout tag commit
+        if: steps.check_tag.outputs.prerelease == 'false'
+        run: git checkout ${{ github.ref }}
+
+      - name: Update latest branch to tag commit
+        if: steps.check_tag.outputs.prerelease == 'false'
+        run: |
+          git branch -f latest
+          git push origin latest --force
