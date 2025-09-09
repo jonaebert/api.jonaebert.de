@@ -5,7 +5,7 @@
     "start": "node api/index.js"
   },
   "dependencies": {
-    "hono": "^4.9.2",
+    "hono": "^4.9.6",
     "@hono/node-server": "^1.19.0",
     "ical-generator": "^9.0.0",
     "node-ical": "^0.20.1",
