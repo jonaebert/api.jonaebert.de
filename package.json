@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "hono": "^4.9.12",
-    "@hono/node-server": "^1.19.4",
+    "@hono/node-server": "^1.19.5",
     "ical-generator": "^9.0.0",
     "node-ical": "^0.21.0",
     "rrule": "^2.8.1"
