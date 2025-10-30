@@ -276,11 +276,66 @@ app.get('/', async (c) => {
       }
       break;
 
+    case 'ticker':
+      let tickerItems = [];
+      let tickerResp = [];
+
+      const tickerItemType = c.req.queries('itemtype')?.shift()
+
+      try {
+        let tickerJSON = '';
+        switch (tickerItemType) {
+          case 'all':
+            tickerResp = await fetch(`${cmsBaseURI}/api/tickers?sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=10`, {
+              headers: {
+                Authorization: `Bearer ${cmsAPIToken}`
+              }
+            });
+            tickerJSON = await tickerResp.json();
+            tickerItems = tickerJSON.data;
+            break;
+
+          case 'single':
+            const tickerItemId = c.req.queries('id')?.shift();
+            tickerResp = await fetch(`${cmsBaseURI}/api/tickers/${tickerItemId}`, {
+              headers: {
+                Authorization: `Bearer ${cmsAPIToken}`
+              }
+            });
+            tickerJSON = await tickerResp.json();
+            tickerItems = tickerJSON.data;
+            break;
+
+          default:
+            console.error(`Invalid ItemType: ${c.req.queries('itemtype')?.shift() || null}`);
+            return c.json({
+              error: 'Invalid or missing ItemType parameter',
+              valid: ['all', 'ticker'],
+              debug: {
+                type: c.req.queries('itemtype')?.shift() || null
+              }
+            }, 500);
+        }
+
+        return c.json({
+          data: tickerItems
+        });
+      } catch (error) {
+        console.error(error);
+        return c.json({
+          error: 'An error occurred',
+          debug: {
+            error: null
+          }
+        }, 500);
+      }
+      break;
+
     default:
       console.error(`Invalid Type: ${c.req.queries('type')?.shift() || null}`);
       return c.json({
         error: 'Invalid or missing Type parameter',
-        valid: ['blog', 'calendar'],
+        valid: ['blog', 'calendar', 'ticker'],
         debug: {
           type: c.req.queries('type')?.shift() || null
         }
