@@ -286,8 +286,12 @@ app.get('/', async (c) => {
         let tickerJSON = '';
         switch (tickerItemType) {
           case 'all':
-            const tickerCalNow = new Date();
-            tickerResp = await fetch(`${cmsBaseURI}/api/tickers?sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=10&filters[endAt][$gte]=${tickerCalNow}`, {
+            let tickerCalNow = new Date();
+            let year = tickerCalNow.getFullYear();
+            let month = (tickerCalNow.getMonth() + 1).toString().padStart(2, '0');
+            let day = tickerCalNow.getDate().toString().padStart(2, '0');
+            tickerCalNow = `${year}-${month}-${day}`;
+            tickerResp = await fetch(`${cmsBaseURI}/api/tickers?sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=10&filters[startAt][$lte]=${tickerCalNow}&filters[endAt][$gte]=${tickerCalNow}`, {
               headers: {
                 Authorization: `Bearer ${cmsAPIToken}`
               }
