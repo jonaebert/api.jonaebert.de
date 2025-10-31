@@ -286,7 +286,8 @@ app.get('/', async (c) => {
         let tickerJSON = '';
         switch (tickerItemType) {
           case 'all':
-            tickerResp = await fetch(`${cmsBaseURI}/api/tickers?sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=10`, {
+            const tickerCalNow = new Date();
+            tickerResp = await fetch(`${cmsBaseURI}/api/tickers?sort=createdAt:desc&pagination[page]=1&pagination[pageSize]=10&filters[endAt][$gte]=${tickerCalNow}`, {
               headers: {
                 Authorization: `Bearer ${cmsAPIToken}`
               }
