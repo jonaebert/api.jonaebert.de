@@ -105,7 +105,7 @@ app.get('/', async (c) => {
         let calJSON = '';
         switch (calItemType) {
           case 'all':
-            calResp = await fetch(`${cmsBaseURI}/api/events?populate[cover]=true&filters[end][$gte]=${calDateNow}&filters[start][$lte]=${calDateLater}&sort=start:asc&pagination[page]=1&pagination[pageSize]=${calMaxItems}`, {
+            calResp = await fetch(`${cmsBaseURI}/api/events?populate[cover]=true&populate[copyright]=true&filters[end][$gte]=${calDateNow}&filters[start][$lte]=${calDateLater}&sort=start:asc&pagination[page]=1&pagination[pageSize]=${calMaxItems}`, {
               headers: {
                 Authorization: `Bearer ${cmsAPIToken}`
               }
@@ -119,7 +119,7 @@ app.get('/', async (c) => {
             const calDownload = c.req.queries('download')?.shift() === 'true';
             
             // Event-Daten vom CMS holen
-            calResp = await fetch(`${cmsBaseURI}/api/events/${calEventId}?populate[cover][populate]`, {
+            calResp = await fetch(`${cmsBaseURI}/api/events/${calEventId}?populate[cover][populate]&populate[copyright]=true`, {
               headers: {
                 Authorization: `Bearer ${cmsAPIToken}`
               }
