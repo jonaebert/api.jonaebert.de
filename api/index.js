@@ -119,13 +119,23 @@ app.get('/', async (c) => {
             const calDownload = c.req.queries('download')?.shift() === 'true';
             
             // Event-Daten vom CMS holen
-            calResp = await fetch(`${cmsBaseURI}/api/events/${calEventId}?populate[cover]=true`, {
+            calResp = await fetch(`${cmsBaseURI}/api/events/${calEventId}?populate[cover][populate]`, {
               headers: {
                 Authorization: `Bearer ${cmsAPIToken}`
               }
             });
             calJSON = await calResp.json();
             calEvents = calJSON.data ? [calJSON.data] : [];
+
+            // Set now-Flag
+            calEvents = calEvents.map(event => {
+              const start = new Date(event.start);
+              const end = new Date(event.end);
+              return {
+                ...event,
+                now: calDateNow >= start && calDateNow <= end
+              };
+            });
 
             // If download requested, generate and return ICS file
             if (calDownload && calEvents.length) {
@@ -160,6 +170,17 @@ app.get('/', async (c) => {
               }
             }, 500);
         }
+
+        // Set now-flag
+        const calNowDate = new Date();
+        calEvents = calEvents.map(event => {
+          const start = new Date(event.start);
+          const end = new Date(event.end);
+          return {
+            ...event,
+            now: calNowDate >= start && calNowDate <= end
+          };
+        });
 
         return c.json({
           data: calEvents
