@@ -15,6 +15,10 @@ APP_START_TS = datetime.now(timezone.utc).isoformat()
 JE_CMS_API_BASE_URL: str = os.getenv("JE_CMS_API_BASE_URL", None)
 JE_CMS_API_TOKEN: str = os.getenv("JE_CMS_API_TOKEN", None)
 JE_WEB_BASE_URL: str = os.getenv("JE_WEB_BASE_URL", None)
+ROOT_PATH: str = os.getenv("ROOT_PATH", "")
+
+if ROOT_PATH and not ROOT_PATH.startswith("/"):
+    ROOT_PATH = f"/{ROOT_PATH}"
 
 
 logger = logging.getLogger("fastapi.cms")
@@ -47,6 +51,7 @@ app = FastAPI(
     version="26.1.0-alpha",
     summary="Jona Ebert's Personal Website API",
     lifespan=lifespan,
+    root_path=ROOT_PATH,
 )
 
 
