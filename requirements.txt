@@ -3,9 +3,5 @@ uvicorn[standard]
 # Additional dependencies
 httpx
 logging
-os
-re
-time
 ics
 datetime
-contextlib
