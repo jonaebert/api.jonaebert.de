@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
     await app.state.cms_client.aclose()
 app = FastAPI(
     title="Jona Ebert (they/them)",
-    version="26.1.0-alpha",
+    version="26.1.0-beta",
     summary="Jona Ebert's Personal Website API",
     lifespan=lifespan,
     root_path=ROOT_PATH,
