@@ -57,12 +57,15 @@ app = FastAPI(
 )
 
 # CORS middleware
+
+
 def parse_cors_origins(origins_str: str) -> list[str]:
     if not origins_str:
         return []
     # Split by comma OR whitespace/newlines, trim, drop empties
     origins = re.split(r"[,\s]+", origins_str.strip())
     return [p for p in (s.strip() for s in origins) if p]
+
 
 origins = parse_cors_origins(JE_API_CORS_ORIGINS)
 app.add_middleware(
@@ -271,6 +274,42 @@ async def download_event_ics(event_id: str, client: httpx.AsyncClient = Depends(
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+# Fetch ticker items from the CMS
+
+
+@app.get("/ticker/items/", description="Fetch ticker items from the CMS", tags=["ticker"])
+async def get_ticker_items(limit: int = 10, client: httpx.AsyncClient = Depends(_get_cms_client)):
+    now = datetime.now(timezone.utc).isoformat()
+    params = {
+        "filters[endAt][$gte]": now,
+        "pagination[page]": 1,
+        "pagination[pageSize]": limit,
+        "sort": "createdAt:desc",
+    }
+
+    tickers_json, _ = await _cms_get("/tickers", params, client)
+    ticker_items = tickers_json.get("data")
+    if not isinstance(ticker_items, list):
+        raise HTTPException(
+            status_code=502, detail="CMS response missing data")
+
+    return ticker_items
+
+
+# Fetch one ticker item from the CMS
+
+
+@app.get("/ticker/item/{item_id}", description="Fetch one ticker item from the CMS", tags=["ticker"])
+async def get_one_ticker_item(item_id: str, client: httpx.AsyncClient = Depends(_get_cms_client)):
+    params = {}
+
+    ticker_json, _ = await _cms_get(f"/tickers/{item_id}", params, client)
+    ticker_item = ticker_json.get("data")
+    if not isinstance(ticker_item, dict):
+        raise HTTPException(status_code=404, detail="Ticker item not found")
+
+    return ticker_item
 
 # Health check endpoint
 
