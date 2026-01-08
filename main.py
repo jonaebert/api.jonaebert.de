@@ -77,6 +77,14 @@ def parse_cors_origins(origins_str: str) -> list[str]:
 
 
 origins = parse_cors_origins(JE_API_CORS_ORIGINS)
+
+# Validate CORS configuration
+if "*" in origins:
+    raise RuntimeError(
+        "CORS allow_credentials=True is incompatible with wildcard origin '*'. "
+        "Please specify explicit origins in JE_API_CORS_ORIGINS."
+    )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
