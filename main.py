@@ -77,9 +77,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Dependency to get CMS client
+
 
 def _get_cms_client() -> httpx.AsyncClient:
     return app.state.cms_client
+
+# Helper to create safe ICS filenames
 
 
 def _safe_ics_filename(subject: str) -> str:
@@ -94,6 +98,8 @@ def _safe_ics_filename(subject: str) -> str:
     }))
     cleaned = re.sub(r"[^A-Za-z0-9_-]+", "_", normalized).strip("_")
     return cleaned or "event"
+
+# Helper to perform CMS GET requests
 
 
 async def _cms_get(path: str, params: dict, client: httpx.AsyncClient) -> tuple[dict, int]:
@@ -232,7 +238,10 @@ async def download_event_ics(event_id: str, client: httpx.AsyncClient = Depends(
     subject = ev.get("subject") or "Event"
     description = ev.get("description") or ""
     location = ev.get("location") or ""
-    url: str = "https://" + JE_WEB_BASE_URL + "/calendar/" + str(event_id)
+    base = JE_WEB_BASE_URL.rstrip("/")
+    if not base.startswith(("http://", "https://")):
+        base = f"https://{base}"
+    url: str = f"{base}/calendar/{event_id}"
     state: str = (ev.get("state") or "").lower()
 
     start_raw = ev.get("start")
