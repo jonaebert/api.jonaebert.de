@@ -142,7 +142,7 @@ async def _cms_get(path: str, params: dict, client: httpx.AsyncClient) -> tuple[
         logger.exception(
             "CMS returned non-JSON response for %s", path, exc_info=e)
         raise HTTPException(
-            status_code=502, detail="Upstream CMS invalid JSON")
+            status_code=502, detail="Upstream CMS invalid JSON") from e
 
 
 # Fetch blog posts from the CMS
