@@ -1,7 +1,6 @@
+# Basic dependencies
 fastapi
 uvicorn[standard]
 # Additional dependencies
 httpx
-logging
 ics
-datetime
