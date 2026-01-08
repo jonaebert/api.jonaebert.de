@@ -34,6 +34,7 @@ async def lifespan(app: FastAPI):
             ("JE_CMS_API_BASE_URL", JE_CMS_API_BASE_URL),
             ("JE_CMS_API_TOKEN", JE_CMS_API_TOKEN),
             ("JE_WEB_BASE_URL", JE_WEB_BASE_URL),
+            ("JE_API_CORS_ORIGINS", JE_API_CORS_ORIGINS),
         )
         if not value
     ]
