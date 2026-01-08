@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import httpx
 import logging
 import os
@@ -15,10 +16,11 @@ APP_START_TS = datetime.now(timezone.utc).isoformat()
 JE_CMS_API_BASE_URL: str = os.getenv("JE_CMS_API_BASE_URL", None)
 JE_CMS_API_TOKEN: str = os.getenv("JE_CMS_API_TOKEN", None)
 JE_WEB_BASE_URL: str = os.getenv("JE_WEB_BASE_URL", None)
-ROOT_PATH: str = os.getenv("ROOT_PATH", "")
+JE_API_ROOT_PATH: str = os.getenv("ROOT_PATH", None)
+JE_API_CORS_ORIGINS: str = os.getenv("JE_API_CORS_ORIGINS", None)
 
-if ROOT_PATH and not ROOT_PATH.startswith("/"):
-    ROOT_PATH = f"/{ROOT_PATH}"
+if JE_API_ROOT_PATH and not JE_API_ROOT_PATH.startswith("/"):
+    JE_API_ROOT_PATH = f"/{JE_API_ROOT_PATH}"
 
 
 logger = logging.getLogger("fastapi.cms")
@@ -51,7 +53,24 @@ app = FastAPI(
     version="26.1.0-beta",
     summary="Jona Ebert's Personal Website API",
     lifespan=lifespan,
-    root_path=ROOT_PATH,
+    root_path=JE_API_ROOT_PATH,
+)
+
+# CORS middleware
+def parse_cors_origins(origins_str: str) -> list[str]:
+    if not origins_str:
+        return []
+    # Split by comma OR whitespace/newlines, trim, drop empties
+    origins = re.split(r"[,\s]+", origins_str.strip())
+    return [p for p in (s.strip() for s in origins) if p]
+
+origins = parse_cors_origins(JE_API_CORS_ORIGINS)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
