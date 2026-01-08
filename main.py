@@ -6,24 +6,30 @@ import logging
 import os
 import re
 import time
+
 from ics import Calendar, Event
 from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
 
+# Application start time
 APP_START_MONO = time.monotonic()
 APP_START_TS = datetime.now(timezone.utc).isoformat()
 
+# Environment variables
 JE_CMS_API_BASE_URL: str = os.getenv("JE_CMS_API_BASE_URL", None)
 JE_CMS_API_TOKEN: str = os.getenv("JE_CMS_API_TOKEN", None)
 JE_WEB_BASE_URL: str = os.getenv("JE_WEB_BASE_URL", None)
 JE_API_ROOT_PATH: str = os.getenv("ROOT_PATH", None)
 JE_API_CORS_ORIGINS: str = os.getenv("JE_API_CORS_ORIGINS", None)
 
+# Ensure root path starts with a slash
 if JE_API_ROOT_PATH and not JE_API_ROOT_PATH.startswith("/"):
     JE_API_ROOT_PATH = f"/{JE_API_ROOT_PATH}"
 
 
 logger = logging.getLogger("fastapi.cms")
+
+# Lifespan context manager
 
 
 @asynccontextmanager
@@ -49,6 +55,8 @@ async def lifespan(app: FastAPI):
     )
     yield
     await app.state.cms_client.aclose()
+
+# FastAPI app instance
 app = FastAPI(
     title="Jona Ebert (they/them)",
     version="26.1.0-beta",
