@@ -332,7 +332,7 @@ async def health_check(client: httpx.AsyncClient = Depends(_get_cms_client)):
     }
 
     results = {}
-    for endpoint in ("articles", "events"):
+    for endpoint in ("articles", "events", "tickers"):
         try:
             _, status_code = await _cms_get(f"/{endpoint}", params, client)
             results[endpoint] = {"status": "ok", "status_code": status_code}
