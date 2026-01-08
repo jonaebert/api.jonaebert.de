@@ -6,6 +6,7 @@ import logging
 import os
 import re
 import time
+from urllib.parse import urlparse
 
 from ics import Calendar, Event
 from datetime import datetime, timedelta, timezone
@@ -256,7 +257,7 @@ async def download_event_ics(event_id: str, client: httpx.AsyncClient = Depends(
     description = ev.get("description") or ""
     location = ev.get("location") or ""
     base = JE_WEB_BASE_URL.rstrip("/")
-    if not base.startswith(("http://", "https://")):
+    if not urlparse(base).scheme:
         base = f"https://{base}"
     url: str = f"{base}/calendar/{event_id}"
     state: str = (ev.get("state") or "").lower()
