@@ -270,9 +270,9 @@ async def download_event_ics(event_id: str, client: httpx.AsyncClient = Depends(
     try:
         dt_start = parse_iso_dt(start_raw)
         dt_end = parse_iso_dt(end_raw)
-    except Exception:
+    except (ValueError, OSError) as e:
         raise HTTPException(
-            status_code=422, detail="Invalid start/end date format")
+            status_code=422, detail="Invalid start/end date format") from e
 
     cal = Calendar()
     e = Event()
