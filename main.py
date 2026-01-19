@@ -22,6 +22,7 @@ JE_CMS_API_TOKEN: str = os.getenv("JE_CMS_API_TOKEN", None)
 JE_WEB_BASE_URL: str = os.getenv("JE_WEB_BASE_URL", None)
 JE_API_ROOT_PATH: str = os.getenv("ROOT_PATH", None)
 JE_API_CORS_ORIGINS: str = os.getenv("JE_API_CORS_ORIGINS", None)
+JE_API_CORS_ORIGINS_REGEX: str = os.getenv("JE_API_CORS_ORIGINS_REGEX", None)
 
 # Ensure root path starts with a slash
 if JE_API_ROOT_PATH and not JE_API_ROOT_PATH.startswith("/"):
@@ -79,21 +80,24 @@ def parse_cors_origins(origins_str: str) -> list[str]:
 
 origins = parse_cors_origins(JE_API_CORS_ORIGINS)
 
-# Validate CORS configuration
+# CORS configuration
 if "*" in origins:
     raise RuntimeError(
         "CORS allow_credentials=True is incompatible with wildcard origin '*'. "
         "Please specify explicit origins in JE_API_CORS_ORIGINS."
     )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Content-Disposition"],
-)
+cors_args = {
+    "allow_origins": origins,
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+    "expose_headers": ["Content-Disposition"],
+}
+if JE_API_CORS_ORIGINS_REGEX:
+    cors_args["allow_origin_regex"] = JE_API_CORS_ORIGINS_REGEX
+
+app.add_middleware(CORSMiddleware, **cors_args)
 
 # Dependency to get CMS client
 
