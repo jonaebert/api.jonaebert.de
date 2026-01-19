@@ -80,6 +80,7 @@ def parse_cors_origins(origins_str: str) -> list[str]:
 
 origins = parse_cors_origins(JE_API_CORS_ORIGINS)
 
+
 # CORS configuration
 if "*" in origins:
     raise RuntimeError(
@@ -95,6 +96,7 @@ cors_args = {
     "expose_headers": ["Content-Disposition"],
 }
 if JE_API_CORS_ORIGINS_REGEX:
+    origins_regex = parse_cors_origins(JE_API_CORS_ORIGINS_REGEX)
     cors_args["allow_origin_regex"] = JE_API_CORS_ORIGINS_REGEX
 
 app.add_middleware(CORSMiddleware, **cors_args)
