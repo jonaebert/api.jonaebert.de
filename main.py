@@ -6,8 +6,10 @@ import logging
 import os
 import re
 import time
+from pathlib import Path
 from urllib.parse import urlparse
 
+from dotenv import load_dotenv
 from ics import Calendar, Event
 from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
@@ -15,6 +17,13 @@ from contextlib import asynccontextmanager
 # Application start time
 APP_START_MONO = time.monotonic()
 APP_START_TS = datetime.now(timezone.utc).isoformat()
+
+# Load .env in development (override system env values)
+env_name = os.getenv('COOLIFY_BRANCH', None)
+if env_name is None:
+    dotenv_path = Path(__file__).resolve().parent / '.env'
+    if dotenv_path.exists():
+        load_dotenv(dotenv_path=dotenv_path, override=True)
 
 # Environment variables
 JE_CMS_API_BASE_URL: str = os.getenv("JE_CMS_API_BASE_URL", None)
@@ -95,7 +104,7 @@ cors_args = {
     "allow_headers": ["*"],
     "expose_headers": ["Content-Disposition"],
 }
-if JE_API_CORS_ORIGINS_REGEX:
+if JE_API_CORS_ORIGINS_REGEX is not None:
     origins_regex = parse_cors_origins(JE_API_CORS_ORIGINS_REGEX)
     cors_args["allow_origin_regex"] = JE_API_CORS_ORIGINS_REGEX
 
