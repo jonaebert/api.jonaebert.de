@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
 # FastAPI app instance
 app = FastAPI(
     title="Jona Ebert (they/them)",
-    version="26.1.1",
+    version="26.2.0",
     summary="Jona Ebert's Personal Website API",
     lifespan=lifespan,
     root_path=JE_API_ROOT_PATH,
@@ -191,6 +191,7 @@ async def get_one_blog_post(post_id: str, client: httpx.AsyncClient = Depends(_g
     params = {
         "populate[author][populate][avatar]": "true",
         "populate[blocks]": "true",
+        "populate[blocks][on][shared.slider][populate]": "*",
         "populate[copyright]": "true",
         "populate[cover]": "true",
         "sort": "createdAt:desc",
