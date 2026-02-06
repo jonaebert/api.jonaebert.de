@@ -191,8 +191,11 @@ async def get_blog_posts(limit: int = 30, client: httpx.AsyncClient = Depends(_g
 async def get_one_blog_post(post_id: str, client: httpx.AsyncClient = Depends(_get_cms_client)):
     params = {
         "populate[author][populate][avatar]": "true",
-        "populate[blocks]": "true",
+        "populate[blocks][on][shared.text][populate]": "*",
+        "populate[blocks][on][shared.media][populate]": "*",
+        "populate[blocks][on][shared.copyright][populate]": "*",
         "populate[blocks][on][shared.slider][populate]": "*",
+        "populate[blocks][on][shared.quote][populate]": "*",
         "populate[copyright]": "true",
         "populate[cover]": "true",
         "sort": "createdAt:desc",
