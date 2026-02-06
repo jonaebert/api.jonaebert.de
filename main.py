@@ -105,8 +105,9 @@ cors_args = {
     "expose_headers": ["Content-Disposition"],
 }
 if JE_API_CORS_ORIGINS_REGEX is not None:
-    origins_regex = parse_cors_origins(JE_API_CORS_ORIGINS_REGEX)
-    cors_args["allow_origin_regex"] = JE_API_CORS_ORIGINS_REGEX
+    origins_regexes = parse_cors_origins(JE_API_CORS_ORIGINS_REGEX)
+    if origins_regexes:
+        cors_args["allow_origin_regex"] = "|".join(f"(?:{r})" for r in origins_regexes)
 
 app.add_middleware(CORSMiddleware, **cors_args)
 
