@@ -6,8 +6,10 @@ import logging
 import os
 import re
 import time
+from pathlib import Path
 from urllib.parse import urlparse
 
+from dotenv import load_dotenv
 from ics import Calendar, Event
 from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
@@ -16,12 +18,20 @@ from contextlib import asynccontextmanager
 APP_START_MONO = time.monotonic()
 APP_START_TS = datetime.now(timezone.utc).isoformat()
 
+# Load .env in development (override system env values)
+env_name = os.getenv('COOLIFY_BRANCH', None)
+if env_name is None:
+    dotenv_path = Path(__file__).resolve().parent / '.env'
+    if dotenv_path.exists():
+        load_dotenv(dotenv_path=dotenv_path, override=True)
+
 # Environment variables
 JE_CMS_API_BASE_URL: str = os.getenv("JE_CMS_API_BASE_URL", None)
 JE_CMS_API_TOKEN: str = os.getenv("JE_CMS_API_TOKEN", None)
 JE_WEB_BASE_URL: str = os.getenv("JE_WEB_BASE_URL", None)
 JE_API_ROOT_PATH: str = os.getenv("ROOT_PATH", None)
 JE_API_CORS_ORIGINS: str = os.getenv("JE_API_CORS_ORIGINS", None)
+JE_API_CORS_ORIGINS_REGEX: str = os.getenv("JE_API_CORS_ORIGINS_REGEX", None)
 
 # Ensure root path starts with a slash
 if JE_API_ROOT_PATH and not JE_API_ROOT_PATH.startswith("/"):
@@ -60,7 +70,7 @@ async def lifespan(app: FastAPI):
 # FastAPI app instance
 app = FastAPI(
     title="Jona Ebert (they/them)",
-    version="26.1.0",
+    version="26.2.0",
     summary="Jona Ebert's Personal Website API",
     lifespan=lifespan,
     root_path=JE_API_ROOT_PATH,
@@ -79,21 +89,27 @@ def parse_cors_origins(origins_str: str) -> list[str]:
 
 origins = parse_cors_origins(JE_API_CORS_ORIGINS)
 
-# Validate CORS configuration
+
+# CORS configuration
 if "*" in origins:
     raise RuntimeError(
         "CORS allow_credentials=True is incompatible with wildcard origin '*'. "
         "Please specify explicit origins in JE_API_CORS_ORIGINS."
     )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Content-Disposition"],
-)
+cors_args = {
+    "allow_origins": origins,
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+    "expose_headers": ["Content-Disposition"],
+}
+if JE_API_CORS_ORIGINS_REGEX is not None:
+    origins_regexes = parse_cors_origins(JE_API_CORS_ORIGINS_REGEX)
+    if origins_regexes:
+        cors_args["allow_origin_regex"] = "|".join(f"(?:{r})" for r in origins_regexes)
+
+app.add_middleware(CORSMiddleware, **cors_args)
 
 # Dependency to get CMS client
 
@@ -175,7 +191,11 @@ async def get_blog_posts(limit: int = 30, client: httpx.AsyncClient = Depends(_g
 async def get_one_blog_post(post_id: str, client: httpx.AsyncClient = Depends(_get_cms_client)):
     params = {
         "populate[author][populate][avatar]": "true",
-        "populate[blocks]": "true",
+        "populate[blocks][on][shared.text][populate]": "*",
+        "populate[blocks][on][shared.media][populate]": "*",
+        "populate[blocks][on][shared.copyright][populate]": "*",
+        "populate[blocks][on][shared.slider][populate]": "*",
+        "populate[blocks][on][shared.quote][populate]": "*",
         "populate[copyright]": "true",
         "populate[cover]": "true",
         "sort": "createdAt:desc",
