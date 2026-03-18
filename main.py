@@ -107,7 +107,8 @@ cors_args = {
 if JE_API_CORS_ORIGINS_REGEX is not None:
     origins_regexes = parse_cors_origins(JE_API_CORS_ORIGINS_REGEX)
     if origins_regexes:
-        cors_args["allow_origin_regex"] = "|".join(f"(?:{r})" for r in origins_regexes)
+        cors_args["allow_origin_regex"] = "|".join(
+            f"(?:{r})" for r in origins_regexes)
 
 app.add_middleware(CORSMiddleware, **cors_args)
 
