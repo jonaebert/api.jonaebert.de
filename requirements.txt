@@ -4,4 +4,5 @@ uvicorn[standard]==0.42.0
 # Additional dependencies
 httpx==0.28.1
 ics==0.7.2
+TatSu==5.12.1
 python-dotenv==1.2.2
