@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
 # FastAPI app instance
 app = FastAPI(
     title="Jona Ebert (they/them)",
-    version="26.2.0",
+    version="26.3.0",
     summary="Jona Ebert's Personal Website API",
     lifespan=lifespan,
     root_path=JE_API_ROOT_PATH,
@@ -107,7 +107,8 @@ cors_args = {
 if JE_API_CORS_ORIGINS_REGEX is not None:
     origins_regexes = parse_cors_origins(JE_API_CORS_ORIGINS_REGEX)
     if origins_regexes:
-        cors_args["allow_origin_regex"] = "|".join(f"(?:{r})" for r in origins_regexes)
+        cors_args["allow_origin_regex"] = "|".join(
+            f"(?:{r})" for r in origins_regexes)
 
 app.add_middleware(CORSMiddleware, **cors_args)
 

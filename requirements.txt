@@ -1,7 +1,8 @@
 # Basic dependencies
-fastapi==0.128.0
-uvicorn[standard]==0.40.0
+fastapi==0.135.1
+uvicorn[standard]==0.42.0
 # Additional dependencies
 httpx==0.28.1
 ics==0.7.2
-python-dotenv==1.2.1
+TatSu==5.12.1
+python-dotenv==1.2.2
