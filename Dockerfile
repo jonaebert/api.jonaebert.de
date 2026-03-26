@@ -1,17 +1,14 @@
-FROM python:3.14-slim
+FROM python:3.14
 
-WORKDIR /app
+WORKDIR /code
 
-# Für Coolify Healthchecks
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
-  && rm -rf /var/lib/apt/lists/*
+COPY ./requirements.txt /code/requirements.txt
 
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-COPY . /app
+COPY ./app /code/app
 
-ENV PORT=8000
-EXPOSE 8000
+# Für Healthchecks (curl)
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]
+CMD ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "8000"]
