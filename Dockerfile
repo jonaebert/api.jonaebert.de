@@ -11,4 +11,4 @@ COPY ./app /code/app
 # Für Healthchecks (curl)
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
-CMD ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000"]
