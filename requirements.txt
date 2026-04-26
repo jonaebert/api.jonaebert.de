@@ -1,8 +1,8 @@
 # Basic dependencies
-fastapi==0.135.2
-uvicorn[standard]==0.42.0
+fastapi==0.135.3
+uvicorn[standard]==0.46.0
 # Additional dependencies
 httpx==0.28.1
-ics==0.7.2
+ics==0.7.3
 TatSu==5.18.0 # pinned because newer TatSu versions are incompatible with ics>=0.7.2
 python-dotenv==1.2.2
