@@ -1,8 +1,8 @@
 # Basic dependencies
-fastapi==0.135.3
-uvicorn[standard]==0.43.0
+fastapi==0.136.1
+uvicorn[standard]==0.46.0
 # Additional dependencies
 httpx==0.28.1
-ics==0.7.2
-TatSu==5.12.1 # pinned because newer TatSu versions are incompatible with ics>=0.7.2
+ics==0.7.3
+TatSu==5.15.1 # last verified version compatible with ics==0.7.3; see github.com/ics-py/ics-py/issues/439
 python-dotenv==1.2.2
