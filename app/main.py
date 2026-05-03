@@ -324,7 +324,45 @@ async def download_event_ics(event_id: str, client: httpx.AsyncClient = Depends(
             "Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
-# Health check endpoint
+# Fetch all copyright info for images from the CMS
+
+
+@app.get("/copyrights/", description="Get copyrights for images", tags=["copyright"])
+async def get_all_copyright_info(limit: int = 30, client: httpx.AsyncClient = Depends(_get_cms_client)):
+    params = {
+        "populate[media]": "true",
+    }
+
+    copyright_json, _ = await _cms_get("/copyrights", params, client)
+    copyright_info = copyright_json.get("data")
+    if not isinstance(copyright_info, list):
+        raise HTTPException(
+            status_code=502, detail="CMS response missing data")
+
+    return copyright_info[:limit]
+
+
+# Fetch one copyright info for images from the CMS
+
+
+async def fetch_one_copyright(image_id: str, client: httpx.AsyncClient):
+    params = {
+        "populate[media]": "true",
+    }
+
+    copyright_json, _ = await _cms_get(f"/copyrights/{image_id}", params, client)
+    copyright_info = copyright_json.get("data")
+    if not isinstance(copyright_info, dict):
+        raise HTTPException(status_code=404, detail="Copyright not found")
+
+    return copyright_info
+
+
+@app.get("/copyright/{image_id}", description="Get copyright for one image", tags=["copyright"])
+async def get_one_copyright_info(image_id: str, client: httpx.AsyncClient = Depends(_get_cms_client)):
+    return await fetch_one_copyright(image_id, client)
+
+# Health check endpoint that verifies CMS connectivity and returns overall status
 
 
 @app.get("/health", description="Health check endpoint", tags=["health"])
@@ -335,7 +373,7 @@ async def health_check(client: httpx.AsyncClient = Depends(_get_cms_client)):
     }
 
     results = {}
-    for endpoint in ("articles", "events"):
+    for endpoint in ("articles", "events", "copyrights"):
         try:
             _, status_code = await _cms_get(f"/{endpoint}", params, client)
             results[endpoint] = {"status": "ok", "status_code": status_code}
