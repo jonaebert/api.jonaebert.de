@@ -350,7 +350,6 @@ async def fetch_one_copyright(image_id: str, client: httpx.AsyncClient):
         "filters[media][documentId][$eq]": image_id,
         "pagination[page]": 1,
         "pagination[pageSize]": 1,
-        "populate[media]": "true",
     }
 
     copyright_json, _ = await _cms_get(f"/copyrights", params, client)
