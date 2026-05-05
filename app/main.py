@@ -354,7 +354,7 @@ async def fetch_one_copyright(image_id: str, client: httpx.AsyncClient):
         "pagination[pageSize]": 1,
     }
 
-    copyright_json, _ = await _cms_get(f"/copyrights", params, client)
+    copyright_json, _ = await _cms_get("/copyrights", params, client)
     copyright_info = copyright_json.get("data")
     if not isinstance(copyright_info, list):
         raise HTTPException(status_code=404, detail="Copyright not found")
