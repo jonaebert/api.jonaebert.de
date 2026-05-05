@@ -331,6 +331,8 @@ async def download_event_ics(event_id: str, client: httpx.AsyncClient = Depends(
 async def get_all_copyright_info(limit: int = 30, client: httpx.AsyncClient = Depends(_get_cms_client)):
     params = {
         "populate[media]": "true",
+        "pagination[page]": 1,
+        "pagination[pageSize]": limit,
     }
 
     copyright_json, _ = await _cms_get("/copyrights", params, client)
