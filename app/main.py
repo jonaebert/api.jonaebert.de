@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
 # FastAPI app instance
 app = FastAPI(
     title="Jona Ebert (they/them)",
-    version="26.4.1",
+    version="26.5.0",
     summary="Jona Ebert's Personal Website API",
     lifespan=lifespan,
     root_path=JE_API_ROOT_PATH,
@@ -324,7 +324,49 @@ async def download_event_ics(event_id: str, client: httpx.AsyncClient = Depends(
             "Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
-# Health check endpoint
+# Fetch all copyright info for images from the CMS
+
+
+@app.get("/copyrights/", description="Get copyrights for images", tags=["copyright"])
+async def get_all_copyright_info(limit: int = 30, client: httpx.AsyncClient = Depends(_get_cms_client)):
+    params = {
+        "populate[media]": "true",
+        "pagination[page]": 1,
+        "pagination[pageSize]": limit,
+    }
+
+    copyright_json, _ = await _cms_get("/copyrights", params, client)
+    copyright_info = copyright_json.get("data")
+    if not isinstance(copyright_info, list):
+        raise HTTPException(
+            status_code=502, detail="CMS response missing data")
+
+    return copyright_info[:limit]
+
+
+# Fetch one copyright info for images from the CMS
+
+
+async def fetch_one_copyright(image_id: str, client: httpx.AsyncClient):
+    params = {
+        "filters[media][documentId][$eq]": image_id,
+        "pagination[page]": 1,
+        "pagination[pageSize]": 1,
+    }
+
+    copyright_json, _ = await _cms_get("/copyrights", params, client)
+    copyright_info = copyright_json.get("data")
+    if not isinstance(copyright_info, list):
+        raise HTTPException(status_code=404, detail="Copyright not found")
+
+    return copyright_info
+
+
+@app.get("/copyright/{image_id}", description="Get copyright for one image", tags=["copyright"])
+async def get_one_copyright_info(image_id: str, client: httpx.AsyncClient = Depends(_get_cms_client)):
+    return await fetch_one_copyright(image_id, client)
+
+# Health check endpoint that verifies CMS connectivity and returns overall status
 
 
 @app.get("/health", description="Health check endpoint", tags=["health"])
@@ -335,7 +377,7 @@ async def health_check(client: httpx.AsyncClient = Depends(_get_cms_client)):
     }
 
     results = {}
-    for endpoint in ("articles", "events"):
+    for endpoint in ("articles", "events", "copyrights"):
         try:
             _, status_code = await _cms_get(f"/{endpoint}", params, client)
             results[endpoint] = {"status": "ok", "status_code": status_code}
