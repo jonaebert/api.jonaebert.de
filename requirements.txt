@@ -1,6 +1,6 @@
 # Basic dependencies
 fastapi==0.136.1
-uvicorn[standard]==0.46.0
+uvicorn[standard]==0.47.0
 # Additional dependencies
 httpx==0.28.1
 ics==0.7.3
