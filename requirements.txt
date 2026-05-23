@@ -4,5 +4,5 @@ uvicorn[standard]==0.47.0
 # Additional dependencies
 httpx==0.28.1
 ics==0.7.3
-TatSu==5.15.1 # last verified version compatible with ics==0.7.3; see github.com/ics-py/ics-py/issues/439
+TatSu==5.20.0 # last verified version compatible with ics==0.7.3; see github.com/ics-py/ics-py/issues/439
 python-dotenv==1.2.2
