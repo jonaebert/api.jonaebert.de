@@ -172,7 +172,6 @@ async def get_blog_posts(limit: int = 30, client: httpx.AsyncClient = Depends(_g
         "pagination[page]": 1,
         "pagination[pageSize]": limit,
         "populate[author][populate][avatar]": "true",
-        "populate[copyright]": "true",
         "populate[cover]": "true",
         "sort": "createdAt:desc",
     }
@@ -194,10 +193,8 @@ async def get_one_blog_post(post_id: str, client: httpx.AsyncClient = Depends(_g
         "populate[author][populate][avatar]": "true",
         "populate[blocks][on][shared.text][populate]": "*",
         "populate[blocks][on][shared.media][populate]": "*",
-        "populate[blocks][on][shared.copyright][populate]": "*",
         "populate[blocks][on][shared.slider][populate]": "*",
         "populate[blocks][on][shared.quote][populate]": "*",
-        "populate[copyright]": "true",
         "populate[cover]": "true",
         "sort": "createdAt:desc",
     }
@@ -221,7 +218,6 @@ async def get_calendar_events(limit: int = 30, client: httpx.AsyncClient = Depen
         "filters[end][$gte]": now.isoformat(),
         "pagination[page]": 1,
         "pagination[pageSize]": limit,
-        "populate[copyright]": "true",
         "populate[cover]": "true",
         "sort": "start:asc",
     }
@@ -239,7 +235,6 @@ async def get_calendar_events(limit: int = 30, client: httpx.AsyncClient = Depen
 
 async def fetch_one_calendar_event(event_id: str, client: httpx.AsyncClient):
     params = {
-        "populate[copyright]": "true",
         "populate[cover]": "true",
     }
 
