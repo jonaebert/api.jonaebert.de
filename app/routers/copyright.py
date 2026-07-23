@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 import httpx
 from ..dependencies import get_cms_client, _cms_get
 
@@ -7,7 +7,8 @@ router = APIRouter()
 
 @router.get("/", description="Get copyrights for images")
 async def get_all_copyright_info(
-    limit: int = 30,
+    limit: int = Query(
+        30, description="Number of copyrights to return", gt=0, le=100),
     client: httpx.AsyncClient = Depends(get_cms_client)
 ):
     params = {
