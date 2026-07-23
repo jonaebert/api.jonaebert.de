@@ -13,7 +13,8 @@ from .config import (
     JE_API_CORS_ORIGINS_REGEX,
 )
 from .dependencies import parse_cors_origins
-from .routers import blog, calendar, copyright, health
+from .routers import blog, calendar, health
+from .routers import copyright as copyright_router
 
 logger = logging.getLogger("fastapi.cms")
 
@@ -77,5 +78,6 @@ app.add_middleware(CORSMiddleware, **cors_args)
 # Include routers
 app.include_router(blog.router, prefix="/blog", tags=["blog"])
 app.include_router(calendar.router, prefix="/calendar", tags=["calendar"])
-app.include_router(copyright.router, prefix="/copyright", tags=["copyright"])
+app.include_router(copyright_router.router,
+                   prefix="/copyright", tags=["copyright"])
 app.include_router(health.router, prefix="/health", tags=["health"])
