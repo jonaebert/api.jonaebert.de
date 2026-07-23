@@ -35,10 +35,10 @@ async def fetch_one_copyright(image_id: str, client: httpx.AsyncClient):
 
     copyright_json, _ = await _cms_get("/copyrights", params, client)
     copyright_info = copyright_json.get("data")
-    if not isinstance(copyright_info, list):
+    if not isinstance(copyright_info, list) or not copyright_info:
         raise HTTPException(status_code=404, detail="Copyright not found")
 
-    return copyright_info
+    return copyright_info[0]
 
 
 @router.get("/{image_id}", description="Get copyright for one image")
