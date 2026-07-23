@@ -72,7 +72,9 @@ async def download_event_ics(
     subject = ev.get("subject") or "Event"
     description = ev.get("description") or ""
     location = ev.get("location") or ""
-    base = JE_WEB_BASE_URL.rstrip("/")
+    base = JE_WEB_BASE_URL
+    if not base.endswith("/"):
+        base = f"{base}/"
     if not urlparse(base).scheme:
         base = f"https://{base}"
     url: str = f"{base}/calendar/{event_id}"
