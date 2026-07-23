@@ -36,7 +36,9 @@ async def _cms_get(path: str, params: dict, client: httpx.AsyncClient) -> tuple[
         logger.warning("CMS HTTP error %s for %s",
                        e.response.status_code, path)
         raise HTTPException(
-            status_code=e.response.status_code, detail=e.response.text) from e
+            status_code=e.response.status_code,
+            detail="Upstream CMS request failed",
+        ) from e
     except httpx.RequestError as e:
         logger.exception("CMS request error for %s", path, exc_info=e)
         raise HTTPException(
