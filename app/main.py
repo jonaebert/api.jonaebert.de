@@ -45,7 +45,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Jona Ebert (they/them)",
-    version="26.7.0",
+    version="26.8.0",
     summary="Jona Ebert's Personal Website API",
     lifespan=lifespan,
     root_path=JE_API_ROOT_PATH,
