@@ -9,7 +9,7 @@ router = APIRouter()
 async def get_blog_posts(
     limit: int = Query(
         30, description="Number of posts to return", gt=0, le=100),
-    category: str | None = Query(
+    categories: str | None = Query(
         None, description="Filter posts by category slug (e.g. 'news', 'projects')", example="braunschweig-2031"),
     client: httpx.AsyncClient = Depends(get_cms_client)
 ):
@@ -20,8 +20,8 @@ async def get_blog_posts(
         "populate[cover]": "true",
         "sort": "createdAt:desc",
     }
-    if category:
-        params["filters[category][slug][$eq]"] = category
+    if categories:
+        params["filters[categories][slug][$eq]"] = categories
 
     blog_json, _ = await _cms_get("/articles", params, client)
     blog_posts = blog_json.get("data")
